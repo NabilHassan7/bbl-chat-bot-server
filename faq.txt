@@ -1,0 +1,11 @@
+Q: What are some ethical considerations for developing AI?
+A: Transparency, fairness, accountability, and privacy are key.
+   Developers should also consider long-term societal impacts.
+
+Q: How can we ensure AI systems are unbiased?
+A: Diverse training data, regular audits, and clear documentation help reduce bias.
+   Collaboration with ethicists and domain experts is also valuable.
+
+Q: What is TF-IDF?
+A: TF-IDF stands for Term Frequency Inverse Document Frequency.
+   It weighs words by how important they are across documents.
