@@ -60,7 +60,7 @@ function preprocess(text) {
   if (!text) return "";
 
   const normalized = text.normalize("NFC").toLowerCase();
-  const cleaned = normalized.replace(/[^a-z\u0980-\u09FF0-9\s]/g, " ");
+  const cleaned = normalized.replace(/[^a-z0-9\s]/g, " ");
   const tokens = cleaned.split(/\s+/).filter(Boolean);
 
   const processed = tokens
@@ -95,7 +95,7 @@ async function expandQuery(query) {
         results.forEach((r) =>
           r.synonyms.forEach((s) => {
             if (!s.includes(" ")) expanded.add(s.toLowerCase());
-          }),
+          })
         );
         resolve();
       });
@@ -116,6 +116,7 @@ async function findAnswers(userQuestion, k = 3) {
   const expansion = preprocess(await expandQuery(userQuestion));
   const query = `${processed} ${expansion}`.trim();
 
+  // TF-IDF scoring
   let scores = [];
   tfidf.tfidfs(query, (i, score) => {
     scores.push({ index: i, score });
@@ -124,47 +125,40 @@ async function findAnswers(userQuestion, k = 3) {
   scores.sort((a, b) => b.score - a.score);
   const best = scores.slice(0, k);
 
-  /* ---------- CONFIDENCE THRESHOLDS ---------- */
-
-  const TFIDF_STRONG = 0.3;
-  const TFIDF_WEAK = 0.2;
-  const TFIDF_SCORE_GAP = 0.08;
+  // -------------------- CONFIDENCE THRESHOLDS --------------------
+  const TFIDF_STRONG = 0.35; // very confident match
+  const TFIDF_SCORE_GAP = 0.1; // ensure top match is clearly above others
 
   if (best.length > 0) {
     const top = best[0];
     const second = best[1];
     const gap = second ? top.score - second.score : top.score;
 
+    // Only return direct answer if very confident and clearly better than next
     if (top.score >= TFIDF_STRONG && gap >= TFIDF_SCORE_GAP) {
-      return {
-        answer: faqs[top.index].a,
-        suggestions: [],
-      };
+      return { answer: faqs[top.index].a, suggestions: [] };
     }
 
-    if (top.score >= TFIDF_WEAK) {
-      return {
-        answer: faqs[top.index].a,
-        suggestions: best.map((b) => faqs[b.index].q),
-      };
-    }
+    // Otherwise return only suggestions
+    return {
+      answer: null,
+      suggestions: best.map((b) => faqs[b.index].q),
+    };
   }
 
-  /* ---------- FUZZY FALLBACK ---------- */
-
+  // -------------------- FUZZY MATCHING FALLBACK --------------------
   const fuseResults = fuse.search(userQuestion, { limit: k });
   const suggestions = fuseResults.map((r) => r.item.q);
 
-  const FUSE_ACCEPT_THRESHOLD = 0.3;
+  const FUSE_ACCEPT_THRESHOLD = 0.25;
 
-  if (fuseResults.length > 0 && fuseResults[0].score <= FUSE_ACCEPT_THRESHOLD) {
-    if (
-      fuseResults.length > 1 &&
-      Math.abs(fuseResults[0].score - fuseResults[1].score) < 0.05
-    ) {
-      return { answer: null, suggestions };
-    }
-
+  if (
+    fuseResults.length > 0 &&
+    fuseResults[0].score <= FUSE_ACCEPT_THRESHOLD &&
+    (fuseResults.length === 1 ||
+      fuseResults[0].score + 0.05 < fuseResults[1]?.score)
+  ) {
+    // Only accept answer if it is clearly the top fuzzy match
     return {
       answer: fuseResults[0].item.a,
       suggestions,
@@ -218,7 +212,7 @@ app.get("/reload", (req, res) => {
 /* -------------------- START SERVER -------------------- */
 
 app.listen(5000, () =>
-  console.log("🚀 Backend running at http://localhost:5000"),
+  console.log("🚀 Backend running at http://localhost:5000")
 );
 
 loadFaqs();

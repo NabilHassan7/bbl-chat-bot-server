@@ -1,14 +1,11 @@
 Q: What is Insurance Shield (loan insurance coverage) for BRAC Bank Personal Loan?
-A: Insurance Shield is an insurance coverage attached to a BRAC Bank Personal Loan that provides financial protection to the borrower during the loan tenure.
-It helps secure the loan in case of covered events such as death or permanent total disability.
+A: Insurance Shield is an insurance coverage attached to a BRAC Bank Personal Loan that provides financial protection to the borrower during the loan tenure. It helps secure the loan in case of covered events such as death or permanent total disability.
 
 Q: Is Insurance Shield mandatory for BRAC Bank Personal Loan?
-A: No, Insurance Shield is not mandatory.
-Customers may choose to take it voluntarily with their personal loan.
+A: No, Insurance Shield is not mandatory. Customers may choose to take it voluntarily with their personal loan.
 
 Q: Who is covered under Insurance Shield for BRAC Bank Personal Loan?
-A: The primary loan applicant is covered under the Insurance Shield.
-Immediate family members such as spouse, children, parents, or siblings can be nominated as beneficiaries.
+A: The primary loan applicant is covered under the Insurance Shield. Immediate family members such as spouse, children, parents, or siblings can be nominated as beneficiaries.
 
 Q: Who can be a beneficiary under Insurance Shield for BRAC Bank Personal Loan?
 A: Immediate family members including spouse, children, parents, or siblings can be beneficiaries.
@@ -17,38 +14,22 @@ Q: What risks are covered under Insurance Shield for BRAC Bank Personal Loan?
 A: Insurance Shield covers death (natural or accidental) and permanent total disability (PTD) during the loan tenure.
 
 Q: What is the coverage amount and tenure of Insurance Shield for BRAC Bank Personal Loan?
-A: The maximum coverage amount is up to BDT 20,00,000.
-The insurance tenure can be up to 60 months, depending on the loan tenure.
-
-Q: What is the tenure of Insurance Shield for BRAC Bank Personal Loan?
-A: The maximum tenure of Insurance Shield is up to 60 months.
+A: The maximum coverage amount is up to BDT 20,00,000. The insurance tenure can be up to 60 months, depending on the loan tenure.
 
 Q: What types of Insurance Shield are available for BRAC Bank Personal Loan?
 A: Two types of Insurance Shield are available: Group Life and Credit Life.
 
 Q: What are the benefits of Group Life Insurance Shield?
-A: Group Life Insurance Shield covers 100% of the loan principal.
-After the bank recovers the outstanding loan amount, any remaining balance is paid to the nominee.
+A: Group Life Insurance Shield covers 100% of the loan principal. After the bank recovers the outstanding loan amount, any remaining balance is paid to the nominee.
 
 Q: What are the benefits of Credit Life Insurance Shield?
-A: Credit Life Insurance Shield covers 200% of the outstanding loan balance.
-The bank receives repayment of the outstanding loan, and the nominee receives an equal amount.
+A: Credit Life Insurance Shield covers 200% of the outstanding loan balance. The bank receives repayment of the outstanding loan, and the nominee receives an equal amount.
 
 Q: Are the premium rates the same for Group Life and Credit Life Insurance Shield?
-A: No, premium rates are different for Group Life and Credit Life.
-Rates may also vary for regular customers and TARA customers.
-
-Q: What is the premium rate for Group Life Insurance Shield?
-A: The exact premium rate is not disclosed.
-Customers are advised to contact a BRAC Bank branch, relationship officer, or call 16221 for details.
-
-Q: What is the premium rate for Credit Life Insurance Shield?
-A: The exact premium rate is not disclosed.
-Customers are advised to contact a BRAC Bank branch, relationship officer, or call 16221 for details.
+A: No, premium rates are different for Group Life and Credit Life. Rates may also vary for regular customers and TARA customers.
 
 Q: How is the premium paid for Insurance Shield with BRAC Bank Personal Loan?
-A: The premium is paid one time at loan disbursement and covers the full loan tenure.
-Customers can choose either bank-financed or self-financed payment methods.
+A: The premium is paid one time at loan disbursement and covers the full loan tenure. Customers can choose either bank-financed or self-financed payment methods.
 
 Q: When is the premium paid for Insurance Shield?
 A: The premium is paid at the time of loan disbursement.
@@ -57,28 +38,28 @@ Q: What is the benefit of the bank-financed premium payment method?
 A: Under the bank-financed method, the premium amount is added to the loan and adjusted through EMIs over the loan tenure.
 
 Q: What is the benefit of the self-financed premium payment method?
-A: Under the self-financed method, customers pay the premium upfront.
-This reduces the disbursed loan amount and avoids paying interest on the premium.
+A: Under the self-financed method, customers pay the premium upfront. This reduces the disbursed loan amount and avoids paying interest on the premium.
 
 Q: Who can avail Insurance Shield with BRAC Bank Personal Loan?
 A: All new personal loan applicants and top-up loan applicants can avail Insurance Shield.
 
 Q: What is the age eligibility for Insurance Shield?
-A: Customers must be between 18 and 64 years of age.
-Coverage is available up to the age of 65.
+A: Customers must be between 18 and 64 years of age. Coverage is available up to the age of 65.
 
 Q: Is a medical test required for Insurance Shield?
 A: No medical test is required to avail Insurance Shield.
 
 Q: What documents are required for Insurance Shield?
-A: Only the standard documents required for a BRAC Bank Personal Loan application are needed.
-No additional documents are required.
+A: Only the standard documents required for a BRAC Bank Personal Loan application are needed. No additional documents are required.
 
 Q: What is the premium refund policy in case of early loan closure?
-A: A pro-rata refund of the unutilized premium will be provided in case of early loan closure.
+A: A pro-rata refund of the unutilized premium will be provided only for early loan closure.
 
-Q: What is the premium refund policy for top-up or partial settlement?
-A: A pro-rata refund of the unutilized premium will be provided for both top-up and partial settlement cases.
+Q: What is the premium refund policy in case of a top-up loan?
+A: A pro-rata refund of the unutilized premium will be provided specifically for top-up loans.
+
+Q: What is the premium refund policy in case of partial settlement of a loan?
+A: A pro-rata refund of the unutilized premium will be provided specifically for partial settlement cases.
 
 Q: Can Insurance Shield be cancelled after purchase?
 A: Yes, Insurance Shield can be cancelled after purchase.
@@ -90,13 +71,10 @@ Q: Can customers switch between Group Life and Credit Life Insurance Shield?
 A: No, switching between different types of Insurance Shield is not allowed.
 
 Q: What does Permanent Total Disability (PTD) mean?
-A: Permanent Total Disability means a condition where a person is completely and permanently unable to work and earn due to a serious illness or accident.
-Examples include paralysis, loss of eyesight, severe brain injury, or loss of multiple limbs.
-The disability must continue for at least 183 days to qualify.
+A: Permanent Total Disability means a condition where a person is completely and permanently unable to work and earn due to a serious illness or accident. Examples include paralysis, loss of eyesight, severe brain injury, or loss of multiple limbs. The disability must continue for at least 183 days to qualify.
 
 Q: Who determines whether a disability is partial or total?
-A: The insurance partner MetLife makes the final decision.
-They review medical reports, severity of the condition, ability to work, and policy terms.
+A: The insurance partner MetLife makes the final decision. They review medical reports, severity of the condition, ability to work, and policy terms.
 
 Q: How long does it take to determine permanent disability?
 A: The assessment period can take up to 183 days (approximately 6 months).
@@ -117,22 +95,19 @@ Q: Who keeps the insurance certificate during the loan period?
 A: The customer keeps the insurance certificate throughout the loan period.
 
 Q: How do I make an insurance claim for Insurance Shield?
-A: Customers or nominees should visit the nearest BRAC Bank branch.
-Bank staff will guide them through the claim process.
+A: Customers or nominees should visit the nearest BRAC Bank branch. Bank staff will guide them through the claim process.
 
 Q: What is the claim process if the loan account holder passes away?
 A: The nominee or family member should visit a BRAC Bank branch with the death certificate and loan details.
 
 Q: How long does it take to process an insurance claim?
-A: Death claims usually take around 21 working days.
-Disability claims require 183 days for assessment plus around 21 working days for processing.
+A: Death claims usually take around 21 working days. Disability claims require 183 days for assessment plus around 21 working days for processing.
 
 Q: Is there a deadline to file an insurance claim?
 A: Yes, insurance claims must be filed within 3 months of the event.
 
 Q: Who should be contacted first for insurance claims—BRAC Bank or MetLife?
-A: Customers or nominees should always contact BRAC Bank first.
-The bank coordinates with MetLife for claim processing.
+A: Customers or nominees should always contact BRAC Bank first. The bank coordinates with MetLife for claim processing.
 
 Q: Who pays the insurance claim amount?
 A: The insurance claim amount is paid by MetLife, not BRAC Bank.
