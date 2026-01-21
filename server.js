@@ -4,81 +4,71 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import natural from "natural";
 import fs from "fs";
-import Fuse from "fuse.js"; // <-- fuzzy matching library
+import Fuse from "fuse.js";
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+/* -------------------- NLP SETUP -------------------- */
+
 const TfIdf = natural.TfIdf;
 const tfidf = new TfIdf();
-let faqs = [];
-let fuse = null; // Fuse index for fuzzy matching
+const stemmer = natural.PorterStemmer;
+const wordnet = new natural.WordNet();
 
-// --- Track consecutive failed attempts ---
+let faqs = [];
+let fuse = null;
+
+/* -------------------- FAIL TRACKING -------------------- */
+
 let failCount = 0;
 const FAIL_LIMIT = 3;
 
-// --- Setup WordNet for synonyms (English only) ---
-const wordnet = new natural.WordNet();
-const stemmer = natural.PorterStemmer;
+/* -------------------- LOAD FAQ FILE -------------------- */
 
-// --- Load FAQ from text file ---
 function loadFaqs() {
   const raw = fs.readFileSync("faq.txt", "utf-8");
   const text = raw.replace(/\r\n/g, "\n");
 
-  // Regex to parse Q/A blocks: Q: ... A: ...
   const regex = /Q:\s*([^\n]+)\nA:\s*([\s\S]*?)(?=\nQ:|$)/g;
   faqs = [];
+  tfidf.documents = [];
 
   let match;
   while ((match = regex.exec(text)) !== null) {
     const q = match[1].trim();
     const a = match[2].trim();
     faqs.push({ q, a });
+    tfidf.addDocument(preprocess(q));
   }
 
-  // --- Build TF-IDF index (use preprocessed question text) ---
-  tfidf.documents = [];
-  faqs.forEach((faq) => {
-    tfidf.addDocument(preprocess(faq.q));
-  });
-
-  // --- Build Fuse fuzzy index on original questions (keeps original text for better fuzzy) ---
-  const fuseOptions = {
+  fuse = new Fuse(faqs, {
     keys: ["q"],
     includeScore: true,
-    threshold: 0.45, // 0.0 = exact, 1.0 = very fuzzy. Tune as needed.
+    threshold: 0.45,
     ignoreLocation: true,
     minMatchCharLength: 2,
-  };
-  fuse = new Fuse(faqs, fuseOptions);
+  });
 
-  console.log(`📚 Loaded ${faqs.length} FAQs (TF-IDF + Fuse index rebuilt)`);
+  console.log(`📚 Loaded ${faqs.length} FAQs`);
 }
 
-// --- Preprocess text ---
-// Normalize unicode, keep english and bangla characters, tokenize, apply english stemming if appropriate.
+/* -------------------- TEXT PREPROCESSING -------------------- */
+
 function preprocess(text) {
   if (!text) return "";
+
   const normalized = text.normalize("NFC").toLowerCase();
-  // Replace punctuation with spaces, but allow a-z, ০-৯ digits, and Bangla unicode block \u0980-\u09FF
   const cleaned = normalized.replace(/[^a-z\u0980-\u09FF0-9\s]/g, " ");
   const tokens = cleaned.split(/\s+/).filter(Boolean);
 
   const processed = tokens
     .map((tok) => {
-      // If token looks like English, remove English stopwords and stem
       if (/[a-z]/.test(tok)) {
-        if (natural.stopwords.includes(tok)) return ""; // drop English stopwords
-        try {
-          return stemmer.stem(tok);
-        } catch {
-          return tok;
-        }
+        if (natural.stopwords.includes(tok)) return "";
+        return stemmer.stem(tok);
       }
-      // For Bangla (or other scripts) leave token as-is
       return tok;
     })
     .filter(Boolean);
@@ -86,13 +76,13 @@ function preprocess(text) {
   return processed.join(" ");
 }
 
-// --- Expand query with English synonyms (WordNet) ---
-// Only attempt expansion for English words (WordNet is English-only).
-async function expandQuery(rawQuery) {
-  if (!rawQuery) return "";
-  const normalized = rawQuery.normalize("NFC").toLowerCase();
-  // extract english words (letters a-z)
-  const words = normalized
+/* -------------------- WORDNET QUERY EXPANSION -------------------- */
+
+async function expandQuery(query) {
+  if (!query) return "";
+
+  const words = query
+    .toLowerCase()
     .replace(/[^a-z\s]/g, " ")
     .split(/\s+/)
     .filter(Boolean);
@@ -100,137 +90,135 @@ async function expandQuery(rawQuery) {
   const expanded = new Set(words);
 
   for (const word of words) {
-    // Lookup synonyms in WordNet (async wrapper)
     await new Promise((resolve) => {
       wordnet.lookup(word, (results) => {
-        results.forEach((result) => {
-          result.synonyms.forEach((syn) => {
-            if (!syn.includes(" ")) {
-              expanded.add(syn.toLowerCase());
-            }
-          });
-        });
+        results.forEach((r) =>
+          r.synonyms.forEach((s) => {
+            if (!s.includes(" ")) expanded.add(s.toLowerCase());
+          }),
+        );
         resolve();
       });
-    }).catch(() => {
-      /* ignore errors from WordNet */
-    });
+    }).catch(() => {});
   }
 
   return Array.from(expanded).join(" ");
 }
 
-// --- Find best answers (TF-IDF primary, Fuse fuzzy fallback) ---
+/* -------------------- CORE MATCHING LOGIC -------------------- */
+
 async function findAnswers(userQuestion, k = 3) {
   if (!userQuestion || !userQuestion.trim()) {
     return { answer: null, suggestions: [] };
   }
 
-  // Preprocess user question for TF-IDF
-  const processedQuestion = preprocess(userQuestion);
+  const processed = preprocess(userQuestion);
+  const expansion = preprocess(await expandQuery(userQuestion));
+  const query = `${processed} ${expansion}`.trim();
 
-  // Expand English query via WordNet and incorporate (raw expansion will be preprocessed before TF-IDF)
-  const expansionRaw = await expandQuery(userQuestion);
-  const expansionProcessed = preprocess(expansionRaw);
-
-  // Combine processed question + processed expansion (gives TF-IDF more material)
-  const queryForTfidf = `${processedQuestion} ${expansionProcessed}`.trim();
-
-  // Compute TF-IDF scores
   let scores = [];
-  tfidf.tfidfs(queryForTfidf, (i, measure) => {
-    scores.push({ index: i, score: measure });
+  tfidf.tfidfs(query, (i, score) => {
+    scores.push({ index: i, score });
   });
 
-  // Sort high → low
   scores.sort((a, b) => b.score - a.score);
   const best = scores.slice(0, k);
 
-  const TFIDF_THRESHOLD = 0.15; // tune this if needed
+  /* ---------- CONFIDENCE THRESHOLDS ---------- */
 
-  // If TF-IDF found a confident match, return it
-  if (best.length > 0 && best[0].score >= TFIDF_THRESHOLD) {
-    return {
-      answer: faqs[best[0].index].a,
-      suggestions: best.map((s) => faqs[s.index]?.q).filter(Boolean),
-    };
+  const TFIDF_STRONG = 0.3;
+  const TFIDF_WEAK = 0.2;
+  const TFIDF_SCORE_GAP = 0.08;
+
+  if (best.length > 0) {
+    const top = best[0];
+    const second = best[1];
+    const gap = second ? top.score - second.score : top.score;
+
+    if (top.score >= TFIDF_STRONG && gap >= TFIDF_SCORE_GAP) {
+      return {
+        answer: faqs[top.index].a,
+        suggestions: [],
+      };
+    }
+
+    if (top.score >= TFIDF_WEAK) {
+      return {
+        answer: faqs[top.index].a,
+        suggestions: best.map((b) => faqs[b.index].q),
+      };
+    }
   }
 
-  // ---------- TF-IDF low confidence: use Fuse fuzzy matching as fallback ----------
+  /* ---------- FUZZY FALLBACK ---------- */
 
-  // If Fuse index isn't built (shouldn't happen), return top-k raw suggestions
-  if (!fuse) {
-    return { answer: null, suggestions: faqs.slice(0, k).map((f) => f.q) };
-  }
-
-  // Normalize user question for Fuse search (keep original script; Fuse is unicode-friendly)
   const fuseResults = fuse.search(userQuestion, { limit: k });
+  const suggestions = fuseResults.map((r) => r.item.q);
 
-  // Prepare suggestions (top k question texts)
-  const suggestions = fuseResults.map((r) => r.item.q).slice(0, k);
+  const FUSE_ACCEPT_THRESHOLD = 0.3;
 
-  // Decide whether to accept top Fuse result as the answer:
-  // Fuse scores are 0 (best) → 1 (worst). Choose an acceptance threshold.
-  const FUSE_ACCEPT_THRESHOLD = 0.35; // lower => stricter
   if (fuseResults.length > 0 && fuseResults[0].score <= FUSE_ACCEPT_THRESHOLD) {
-    // Good fuzzy match — return its answer and also suggestions list
+    if (
+      fuseResults.length > 1 &&
+      Math.abs(fuseResults[0].score - fuseResults[1].score) < 0.05
+    ) {
+      return { answer: null, suggestions };
+    }
+
     return {
       answer: fuseResults[0].item.a,
       suggestions,
     };
   }
 
-  // Otherwise return no exact answer but give suggestions (from Fuse)
-  return {
-    answer: null,
-    suggestions: suggestions.length ? suggestions : faqs.slice(0, k).map((f) => f.q),
-  };
+  return { answer: null, suggestions };
 }
 
-// --- API endpoint ---
+/* -------------------- API ENDPOINT -------------------- */
+
 app.post("/ask", async (req, res) => {
   const { question } = req.body;
+
   try {
     const result = await findAnswers(question);
 
     if (result.answer) {
-      // Found an answer → reset fail count
       failCount = 0;
       return res.json(result);
-    } else {
-      // No exact match → increment fail count
-      failCount++;
-
-      if (failCount >= FAIL_LIMIT) {
-        // Special fallback after 3 fails
-        failCount = 0; // reset so it doesn’t repeat forever
-        return res.json({
-          answer:
-            "Sorry, I wasn't able to answer your question after multiple tries. Call 16221 (toll free) to reach our support team for further detailed help.",
-          suggestions: [],
-        });
-      }
-
-      // Regular suggestion response
-      return res.json(result);
     }
+
+    failCount++;
+    if (failCount >= FAIL_LIMIT) {
+      failCount = 0;
+      return res.json({
+        answer:
+          "Sorry, I wasn't able to answer your question after multiple tries. Call 16221 (toll free) to reach our support team for further detailed help.",
+        suggestions: [],
+      });
+    }
+
+    res.json(result);
   } catch (err) {
-    console.error("Error in /ask:", err);
-    return res.status(500).json({ answer: null, suggestions: [] });
+    console.error("Error:", err);
+    res.status(500).json({ answer: null, suggestions: [] });
   }
 });
 
-// --- Reload FAQs without restart ---
+/* -------------------- RELOAD ENDPOINT -------------------- */
+
 app.get("/reload", (req, res) => {
   try {
     loadFaqs();
     res.json({ status: "FAQ reloaded" });
-  } catch (err) {
-    console.error("Reload error:", err);
+  } catch {
     res.status(500).json({ status: "reload failed" });
   }
 });
 
-// --- Start server ---
-app.listen(5000, () => console.log("🚀 Backend running at http://localhost:5000"));
+/* -------------------- START SERVER -------------------- */
+
+app.listen(5000, () =>
+  console.log("🚀 Backend running at http://localhost:5000"),
+);
+
 loadFaqs();
